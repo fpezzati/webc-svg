@@ -1,7 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-const package = require("./package.json");
+const pkg = require("./package.json");
 const commonPaths = require("./build-utils/config/commonPaths.js");
 
 const isDebug = !process.argv.includes("release");
@@ -10,12 +10,12 @@ const port = process.env.PORT || 3000;
 module.exports = {
   entry: commonPaths.entryPath,
   output: {
-    uniqueName: package.name,
+    uniqueName: pkg.name,
     publicPath: "/",
     path: commonPaths.outputPath,
-    filename: `${package.version}/js/[name].[chunkhash:8].js`,
-    chunkFilename: `${package.version}/js/[name].[chunkhash:8].js`,
-    assetModuleFilename: isDebug ? `images/[path][name].[contenthash:8][ext]` : `images/[path][contenthash:8][ext]`,
+    filename: `${pkg.version}/js/[name].[chunkhash:8].js`,
+    chunkFilename: `${pkg.version}/js/[name].[chunkhash:8].js`,
+    assetModuleFilename: isDebug ? `assets/[path][name].[contenthash:8][ext]` : `assets/[name].[contenthash:8][ext]`,
     crossOriginLoading: "anonymous",
   },
   plugins: [
@@ -25,7 +25,7 @@ module.exports = {
     }),
   ],
   devServer: {
-    port: port,
+    port,
     static: {
       directory: commonPaths.outputPath,
     },
@@ -38,18 +38,33 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/, // exclude node_modules
+        exclude: /node_modules/,
         use: ["babel-loader"],
       },
       {
+        // Important: css-loader first (resolves url()), then to-string-loader
         test: /\.css$/i,
-        use: ["to-string-loader", "css-loader"],
+        use: [
+          {
+            loader: "to-string-loader",
+          },
+          {
+            loader: "css-loader",
+            options: { url: true },
+          },
+        ],
       },
       {
+        // Inline modern webfonts into CSS (no network requests)
         test: /\.(woff|woff2)$/i,
         type: "asset/inline",
+      },
+      {
+        // Other assets (images, etc.)
+        test: /\.(png|jpg|jpeg|gif|svg|eot|ttf)$/i,
+        type: "asset/resource",
         generator: {
-          filename: "fonts/[name].[hash][ext]",
+          filename: "assets/[name].[hash][ext]",
         },
       },
     ],
