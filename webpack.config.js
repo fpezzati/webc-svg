@@ -43,7 +43,14 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        use: ["raw-loader", "css-loader"],
+        use: ["to-string-loader", "css-loader"],
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|svg)$/i,
+        type: "asset/resource",
+        generator: {
+          filename: "fonts/[name].[hash][ext]",
+        },
       },
     ],
   },
