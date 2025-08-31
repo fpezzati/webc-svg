@@ -37,7 +37,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js)$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/, // exclude node_modules
         use: ["babel-loader"],
       },
@@ -46,8 +46,8 @@ module.exports = {
         use: ["to-string-loader", "css-loader"],
       },
       {
-        test: /\.(woff|woff2|eot|ttf|svg)$/i,
-        type: "asset/resource",
+        test: /\.(woff|woff2)$/i,
+        type: "asset/inline",
         generator: {
           filename: "fonts/[name].[hash][ext]",
         },
